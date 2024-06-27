@@ -1,10 +1,9 @@
 import streamlit as st
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import speech_recognition as sr
+from gtts import gTTS
 import os
 import tempfile
-import soundfile as sf
-import speech_recognition as sr
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from gtts import gTTS
 
 # Function to convert audio to text using speech_recognition
 def audio_to_text(audio_data):
@@ -32,20 +31,26 @@ def virtual_psychiatrist():
     st.title("Virtual Psychiatrist Assistant")
     st.markdown("Interact with the Virtual Psychiatrist")
 
-    uploaded_file = st.file_uploader("Upload an audio file", type=['wav', 'mp3', 'ogg', 'flac', 'aac'])
+    uploaded_file = st.file_uploader("Upload an audio file", type=['wav', 'mp3'])
 
     if uploaded_file is not None:
-        try:
-            # Create a temporary directory if it doesn't exist
-            temp_dir = tempfile.mkdtemp()
-            temp_audio = os.path.join(temp_dir, "uploaded_audio.wav")
+        # Check if the uploaded file is in WAV or MP3 format
+        file_extension = os.path.splitext(uploaded_file.name)[1]
+        if file_extension.lower() not in ['.wav', '.mp3']:
+            st.error("Please upload a valid audio file in WAV or MP3 format.")
+            return
 
-            # Save the uploaded file as a temporary WAV file
-            with open(temp_audio, "wb") as f:
+        try:
+            # Create a temporary directory to save the uploaded file
+            temp_dir = tempfile.mkdtemp()
+            audio_data = os.path.join(temp_dir, uploaded_file.name)
+
+            # Save the uploaded file locally
+            with open(audio_data, "wb") as f:
                 f.write(uploaded_file.getbuffer())
 
             # Perform speech-to-text conversion
-            transcript = audio_to_text(temp_audio)
+            transcript = audio_to_text(audio_data)
             
             if "Error" in transcript:
                 st.error(transcript)
@@ -55,14 +60,35 @@ def virtual_psychiatrist():
             st.subheader("Your Comment:")
             st.write(transcript)
 
-            # Optionally, perform further processing or analysis
+            # Generate response
+            prompt = f"""[INST] 
+            Please respond to the following comment. 
+            {transcript} 
+            [/INST]"""
+
+            # Load tokenizer and model with CPU settings
+            tokenizer = AutoTokenizer.from_pretrained("TheBloke/Mistral-7B-Instruct-v0.2-GPTQ")
+            model = AutoModelForCausalLM.from_pretrained("TheBloke/Mistral-7B-Instruct-v0.2-GPTQ", device='cpu')
+
+            input_ids = tokenizer(prompt, return_tensors='pt').input_ids
+            output = model.generate(input_ids=input_ids, max_length=200)
+            response = tokenizer.decode(output[0], skip_special_tokens=True)
+
+            # Display generated response
+            st.subheader("Generated Response:")
+            st.write(response)
+
+            # Convert response to speech and provide download link
+            audio_file = text_to_speech(response)
+            st.audio(audio_file, format='audio/mp3')
 
         except Exception as e:
             st.error(f"Error: {str(e)}")
         finally:
-            # Clean up temporary directory
+            # Clean up: Remove temporary directory and file
             if os.path.exists(temp_dir):
-                shutil.rmtree(temp_dir, ignore_errors=True)
+                os.remove(audio_data)
+                os.rmdir(temp_dir)
 
 # Run the Streamlit app
 if __name__ == "__main__":
