@@ -3,18 +3,6 @@ import speech_recognition as sr
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from gtts import gTTS
 import os
-from pydub import AudioSegment
-import io
-
-# Set FFPROBE_PATH if not found automatically
-os.environ["FFPROBE_PATH"] = r"C:\flac-1.4.1-win\Win64\flac.exe"
-
-# Function to convert uploaded audio file to WAV format
-def convert_to_wav(audio_file):
-    audio = AudioSegment.from_file(audio_file)
-    wav_file = io.BytesIO()
-    audio.export(wav_file, format='wav')
-    return wav_file
 
 # Function to convert audio to text using speech_recognition
 def audio_to_text(audio_data):
@@ -46,11 +34,17 @@ def virtual_psychiatrist():
 
     if uploaded_file is not None:
         try:
-            # Convert uploaded audio file to WAV format
-            wav_file = convert_to_wav(uploaded_file)
-            
+            # Create 'uploads' directory if it doesn't exist
+            if not os.path.exists('uploads'):
+                os.makedirs('uploads')
+
+            # Save the uploaded file locally
+            audio_data = os.path.join("uploads", uploaded_file.name)
+            with open(audio_data, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+
             # Perform speech-to-text conversion
-            transcript = audio_to_text(wav_file)
+            transcript = audio_to_text(audio_data)
             
             if "Error" in transcript:
                 st.error(transcript)
