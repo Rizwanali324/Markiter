@@ -1,4 +1,6 @@
 import streamlit as st
+import os
+import tempfile
 import soundfile as sf
 import speech_recognition as sr
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -34,8 +36,16 @@ def virtual_psychiatrist():
 
     if uploaded_file is not None:
         try:
+            # Create a temporary directory if it doesn't exist
+            temp_dir = tempfile.mkdtemp()
+            temp_audio = os.path.join(temp_dir, "uploaded_audio.wav")
+
+            # Save the uploaded file as a temporary WAV file
+            with open(temp_audio, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+
             # Perform speech-to-text conversion
-            transcript = audio_to_text(uploaded_file)
+            transcript = audio_to_text(temp_audio)
             
             if "Error" in transcript:
                 st.error(transcript)
@@ -49,6 +59,10 @@ def virtual_psychiatrist():
 
         except Exception as e:
             st.error(f"Error: {str(e)}")
+        finally:
+            # Clean up temporary directory
+            if os.path.exists(temp_dir):
+                shutil.rmtree(temp_dir, ignore_errors=True)
 
 # Run the Streamlit app
 if __name__ == "__main__":
