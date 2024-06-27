@@ -4,3 +4,4 @@ speechrecognition==3.8.1
 gtts==2.2.3
 torch
 streamlit==1.13.0
+tokenizers
