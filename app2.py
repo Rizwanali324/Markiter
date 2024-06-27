@@ -14,7 +14,7 @@ def main():
     uploaded_file = st.file_uploader("Choose an MP3 file", type=["mp3"])
 
     if uploaded_file is not None:
-        # Process the uploaded file
+        # Save the uploaded file to disk
         with open("temp.mp3", "wb") as f:
             f.write(uploaded_file.getbuffer())
 
