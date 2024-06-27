@@ -1,8 +1,20 @@
 import streamlit as st
-from transformers import AutoModelForCausalLM, AutoTokenizer
 import speech_recognition as sr
+from transformers import AutoModelForCausalLM, AutoTokenizer
 from gtts import gTTS
 import os
+from pydub import AudioSegment
+import io
+
+# Set FFPROBE_PATH if not found automatically
+os.environ["FFPROBE_PATH"] = r"C:\flac-1.4.1-win\Win64\flac.exe"
+
+# Function to convert uploaded audio file to WAV format
+def convert_to_wav(audio_file):
+    audio = AudioSegment.from_file(audio_file)
+    wav_file = io.BytesIO()
+    audio.export(wav_file, format='wav')
+    return wav_file
 
 # Function to convert audio to text using speech_recognition
 def audio_to_text(audio_data):
@@ -30,21 +42,15 @@ def virtual_psychiatrist():
     st.title("Virtual Psychiatrist Assistant")
     st.markdown("Interact with the Virtual Psychiatrist")
 
-    uploaded_file = st.file_uploader("Upload an audio file", type=['wav', 'mp3'])
+    uploaded_file = st.file_uploader("Upload an audio file", type=['wav', 'mp3', 'ogg', 'flac', 'aac'])
 
     if uploaded_file is not None:
         try:
-            # Create 'uploads' directory if it doesn't exist
-            if not os.path.exists('uploads'):
-                os.makedirs('uploads')
-
-            # Save the uploaded file locally
-            audio_data = os.path.join("uploads", uploaded_file.name)
-            with open(audio_data, "wb") as f:
-                f.write(uploaded_file.getbuffer())
-
+            # Convert uploaded audio file to WAV format
+            wav_file = convert_to_wav(uploaded_file)
+            
             # Perform speech-to-text conversion
-            transcript = audio_to_text(audio_data)
+            transcript = audio_to_text(wav_file)
             
             if "Error" in transcript:
                 st.error(transcript)
@@ -55,10 +61,7 @@ def virtual_psychiatrist():
             st.write(transcript)
 
             # Generate response
-            prompt = f"""[INST] 
-            Please respond to the following comment. 
-            {transcript} 
-            [/INST]"""
+            prompt = f"[INST] Please respond to the following comment. {transcript} [/INST]"
 
             # Load tokenizer and model with CPU settings
             tokenizer = AutoTokenizer.from_pretrained("TheBloke/Mistral-7B-Instruct-v0.2-GPTQ")
