@@ -1,9 +1,8 @@
 import streamlit as st
-from transformers import AutoModelForCausalLM, AutoTokenizer
 import speech_recognition as sr
 from gtts import gTTS
-from pydub import AudioSegment
-import tempfile
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from tempfile import NamedTemporaryFile
 import os
 
 # Function to convert audio to text using speech_recognition
@@ -21,7 +20,7 @@ def audio_to_text(audio_data):
     except sr.UnknownValueError:
         return "Error: Unable to recognize speech."
 
-# Function to convert text to speech using gTTS and save as WAV
+# Function to convert text to speech using gTTS
 def text_to_speech(text, filename="output.wav"):
     tts = gTTS(text, lang='en')
     tts.save(filename)
@@ -36,22 +35,16 @@ def main():
 
     if uploaded_file is not None:
         try:
-            # Create temporary directory if it doesn't exist
-            temp_dir = "temp"
-            if not os.path.exists(temp_dir):
-                os.makedirs(temp_dir)
+            # Create temporary file to store audio
+            temp_audio = NamedTemporaryFile(delete=False, suffix=".wav")
+            temp_audio.close()
 
-            # Save the uploaded file locally
-            audio_data = os.path.join(temp_dir, uploaded_file.name)
-            with open(audio_data, "wb") as f:
+            # Save uploaded file locally
+            with open(temp_audio.name, "wb") as f:
                 f.write(uploaded_file.getbuffer())
 
-            # Convert uploaded audio to WAV using pydub if it's not already in WAV format
-            if uploaded_file.type != "audio/wav":
-                audio_data = convert_to_wav(audio_data)
-
             # Perform speech-to-text conversion
-            transcript = audio_to_text(audio_data)
+            transcript = audio_to_text(temp_audio.name)
 
             if "Error" in transcript:
                 st.error(transcript)
@@ -85,17 +78,6 @@ def main():
 
         except Exception as e:
             st.error(f"Error: {str(e)}")
-
-# Helper function to convert audio to WAV using pydub
-def convert_to_wav(audio_data):
-    audio = AudioSegment.from_file(audio_data)
-
-    # Create a temporary file to save as WAV
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_wav_file:
-        wav_filename = temp_wav_file.name
-        audio.export(wav_filename, format="wav")
-
-    return wav_filename
 
 if __name__ == "__main__":
     main()
