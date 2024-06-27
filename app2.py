@@ -4,6 +4,9 @@ import speech_recognition as sr
 from gtts import gTTS
 import os
 import librosa
+import numpy as np
+
+# Ensure numpy import_array() is called in Cython modules if used
 
 # Function to convert audio to text using speech_recognition
 def audio_to_text(audio_data):
