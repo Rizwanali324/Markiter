@@ -1,0 +1,6 @@
+gradio==3.0.0
+transformers==4.20.0
+speechrecognition==3.8.1
+gtts==2.2.3
+torch==1.11.0
+streamlit==1.13.0
