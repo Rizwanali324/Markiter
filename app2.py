@@ -6,9 +6,9 @@ import os
 from pydub import AudioSegment
 import io
 
-# Function to convert MP3 to WAV
-def mp3_to_wav(mp3_file):
-    audio = AudioSegment.from_file(mp3_file)
+# Function to convert uploaded audio file to WAV format
+def convert_to_wav(audio_file):
+    audio = AudioSegment.from_file(audio_file)
     wav_file = io.BytesIO()
     audio.export(wav_file, format='wav')
     return wav_file
@@ -39,12 +39,12 @@ def virtual_psychiatrist():
     st.title("Virtual Psychiatrist Assistant")
     st.markdown("Interact with the Virtual Psychiatrist")
 
-    uploaded_file = st.file_uploader("Upload an audio file", type=['mp3'])
+    uploaded_file = st.file_uploader("Upload an audio file", type=['wav', 'mp3', 'ogg', 'flac', 'aac'])
 
     if uploaded_file is not None:
         try:
-            # Convert MP3 to WAV
-            wav_file = mp3_to_wav(uploaded_file)
+            # Convert uploaded audio file to WAV format
+            wav_file = convert_to_wav(uploaded_file)
             
             # Perform speech-to-text conversion
             transcript = audio_to_text(wav_file)
