@@ -3,6 +3,7 @@ import speech_recognition as sr
 from gtts import gTTS
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from tempfile import NamedTemporaryFile
+from pydub import AudioSegment
 import os
 
 # Function to convert audio to text using speech_recognition
@@ -19,6 +20,16 @@ def audio_to_text(audio_data):
         return "Error: API unavailable or unresponsive."
     except sr.UnknownValueError:
         return "Error: Unable to recognize speech."
+
+# Function to convert mp3 to wav using pydub
+def convert_mp3_to_wav(mp3_file):
+    try:
+        audio = AudioSegment.from_file(mp3_file)
+        wav_filename = os.path.splitext(mp3_file)[0] + ".wav"
+        audio.export(wav_filename, format="wav")
+        return wav_filename
+    except Exception as e:
+        return str(e)
 
 # Function to convert text to speech using gTTS
 def text_to_speech(text, filename="output.wav"):
@@ -43,8 +54,18 @@ def main():
             with open(temp_audio.name, "wb") as f:
                 f.write(uploaded_file.getbuffer())
 
+            # Check file type and convert if necessary
+            if uploaded_file.type == 'audio/mp3':
+                converted_file = convert_mp3_to_wav(temp_audio.name)
+                if converted_file is None:
+                    st.error("Error converting MP3 to WAV.")
+                    return
+                audio_data = converted_file
+            else:
+                audio_data = temp_audio.name
+
             # Perform speech-to-text conversion
-            transcript = audio_to_text(temp_audio.name)
+            transcript = audio_to_text(audio_data)
 
             if "Error" in transcript:
                 st.error(transcript)
