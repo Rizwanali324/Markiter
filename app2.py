@@ -1,7 +1,9 @@
 import streamlit as st
-import speech_recognition as sr
 from transformers import AutoModelForCausalLM, AutoTokenizer
+import speech_recognition as sr
 from gtts import gTTS
+from pydub import AudioSegment
+import tempfile
 import os
 
 # Function to convert audio to text using speech_recognition
@@ -19,33 +21,38 @@ def audio_to_text(audio_data):
     except sr.UnknownValueError:
         return "Error: Unable to recognize speech."
 
-# Function to convert text to speech
-def text_to_speech(text, filename="output.mp3"):
+# Function to convert text to speech using gTTS and save as WAV
+def text_to_speech(text, filename="output.wav"):
     tts = gTTS(text, lang='en')
     tts.save(filename)
     return filename
 
-# Main function for Streamlit interface
-def virtual_psychiatrist():
+# Main function for Streamlit app
+def main():
     st.title("Virtual Psychiatrist Assistant")
     st.markdown("Interact with the Virtual Psychiatrist")
 
-    uploaded_file = st.file_uploader("Upload an audio file", type=['wav', 'mp3', 'ogg', 'flac', 'aac'])
+    uploaded_file = st.file_uploader("Upload an audio file", type=['wav', 'mp3'])
 
     if uploaded_file is not None:
         try:
-            # Create 'uploads' directory if it doesn't exist
-            if not os.path.exists('uploads'):
-                os.makedirs('uploads')
+            # Create temporary directory if it doesn't exist
+            temp_dir = "temp"
+            if not os.path.exists(temp_dir):
+                os.makedirs(temp_dir)
 
             # Save the uploaded file locally
-            audio_data = os.path.join("uploads", uploaded_file.name)
+            audio_data = os.path.join(temp_dir, uploaded_file.name)
             with open(audio_data, "wb") as f:
                 f.write(uploaded_file.getbuffer())
 
+            # Convert uploaded audio to WAV using pydub if it's not already in WAV format
+            if uploaded_file.type != "audio/wav":
+                audio_data = convert_to_wav(audio_data)
+
             # Perform speech-to-text conversion
             transcript = audio_to_text(audio_data)
-            
+
             if "Error" in transcript:
                 st.error(transcript)
                 return
@@ -55,7 +62,10 @@ def virtual_psychiatrist():
             st.write(transcript)
 
             # Generate response
-            prompt = f"[INST] Please respond to the following comment. {transcript} [/INST]"
+            prompt = f"""[INST] 
+            Please respond to the following comment. 
+            {transcript} 
+            [/INST]"""
 
             # Load tokenizer and model with CPU settings
             tokenizer = AutoTokenizer.from_pretrained("TheBloke/Mistral-7B-Instruct-v0.2-GPTQ")
@@ -71,11 +81,21 @@ def virtual_psychiatrist():
 
             # Convert response to speech and provide download link
             audio_file = text_to_speech(response)
-            st.audio(audio_file, format='audio/mp3')
+            st.audio(audio_file, format='audio/wav')
 
         except Exception as e:
             st.error(f"Error: {str(e)}")
 
-# Run the Streamlit app
+# Helper function to convert audio to WAV using pydub
+def convert_to_wav(audio_data):
+    audio = AudioSegment.from_file(audio_data)
+
+    # Create a temporary file to save as WAV
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_wav_file:
+        wav_filename = temp_wav_file.name
+        audio.export(wav_filename, format="wav")
+
+    return wav_filename
+
 if __name__ == "__main__":
-    virtual_psychiatrist()
+    main()
