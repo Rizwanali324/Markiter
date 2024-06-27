@@ -7,3 +7,4 @@ tokenizers>=0.19,<0.20  # Ensure it's within the compatible range
 gradio==3.0.0
 soundfile
 optimum
+librosa
