@@ -3,7 +3,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import speech_recognition as sr
 from gtts import gTTS
 import os
-import tempfile
+import librosa
 
 # Function to convert audio to text using speech_recognition
 def audio_to_text(audio_data):
@@ -34,24 +34,21 @@ def virtual_psychiatrist():
     uploaded_file = st.file_uploader("Upload an audio file", type=['wav', 'mp3'])
 
     if uploaded_file is not None:
-        # Check if the uploaded file is in WAV or MP3 format
-        file_extension = os.path.splitext(uploaded_file.name)[1]
-        if file_extension.lower() not in ['.wav', '.mp3']:
-            st.error("Please upload a valid audio file in WAV or MP3 format.")
-            return
-
         try:
-            # Create a temporary directory to save the uploaded file
-            temp_dir = tempfile.mkdtemp()
-            audio_data = os.path.join(temp_dir, uploaded_file.name)
+            # Create 'uploads' directory if it doesn't exist
+            if not os.path.exists('uploads'):
+                os.makedirs('uploads')
 
             # Save the uploaded file locally
+            audio_data = os.path.join("uploads", uploaded_file.name)
             with open(audio_data, "wb") as f:
                 f.write(uploaded_file.getbuffer())
 
-            # Perform speech-to-text conversion
+            # Perform speech-to-text conversion using librosa to load audio
+            audio, sr_audio = librosa.load(audio_data, sr=None)
+
+            # Display the user's spoken text
             transcript = audio_to_text(audio_data)
-            
             if "Error" in transcript:
                 st.error(transcript)
                 return
@@ -84,11 +81,6 @@ def virtual_psychiatrist():
 
         except Exception as e:
             st.error(f"Error: {str(e)}")
-        finally:
-            # Clean up: Remove temporary directory and file
-            if os.path.exists(temp_dir):
-                os.remove(audio_data)
-                os.rmdir(temp_dir)
 
 # Run the Streamlit app
 if __name__ == "__main__":
