@@ -1,17 +1,8 @@
 import streamlit as st
+import soundfile as sf
 import speech_recognition as sr
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from gtts import gTTS
-import os
-from pydub import AudioSegment
-import io
-
-# Function to convert uploaded audio file to WAV format
-def convert_to_wav(audio_file):
-    audio = AudioSegment.from_file(audio_file)
-    wav_file = io.BytesIO()
-    audio.export(wav_file, format='wav')
-    return wav_file
 
 # Function to convert audio to text using speech_recognition
 def audio_to_text(audio_data):
@@ -43,11 +34,8 @@ def virtual_psychiatrist():
 
     if uploaded_file is not None:
         try:
-            # Convert uploaded audio file to WAV format
-            wav_file = convert_to_wav(uploaded_file)
-            
             # Perform speech-to-text conversion
-            transcript = audio_to_text(wav_file)
+            transcript = audio_to_text(uploaded_file)
             
             if "Error" in transcript:
                 st.error(transcript)
@@ -57,24 +45,7 @@ def virtual_psychiatrist():
             st.subheader("Your Comment:")
             st.write(transcript)
 
-            # Generate response
-            prompt = f"[INST] Please respond to the following comment. {transcript} [/INST]"
-
-            # Load tokenizer and model with CPU settings
-            tokenizer = AutoTokenizer.from_pretrained("TheBloke/Mistral-7B-Instruct-v0.2-GPTQ")
-            model = AutoModelForCausalLM.from_pretrained("TheBloke/Mistral-7B-Instruct-v0.2-GPTQ", device='cpu')
-
-            input_ids = tokenizer(prompt, return_tensors='pt').input_ids
-            output = model.generate(input_ids=input_ids, max_length=200)
-            response = tokenizer.decode(output[0], skip_special_tokens=True)
-
-            # Display generated response
-            st.subheader("Generated Response:")
-            st.write(response)
-
-            # Convert response to speech and provide download link
-            audio_file = text_to_speech(response)
-            st.audio(audio_file, format='audio/mp3')
+            # Optionally, perform further processing or analysis
 
         except Exception as e:
             st.error(f"Error: {str(e)}")
