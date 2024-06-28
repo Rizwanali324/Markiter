@@ -17,6 +17,8 @@ def setup_model(model_name):
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
             device_map="auto",
+            low_cpu_mem_usage=False,    # Set low_cpu_mem_usage to False
+
             trust_remote_code=False,
             revision="main"
         )
