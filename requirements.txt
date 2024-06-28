@@ -9,4 +9,4 @@ pyngrok
 accelerate==0.31.0
 bitsandbytes==0.43.1
 tokenizers==0.13.3
-numpy==2.0.0
+numpy
