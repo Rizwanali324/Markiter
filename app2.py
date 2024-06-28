@@ -16,7 +16,6 @@ def setup_model(model_name):
     try:
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            device_map="auto",
             low_cpu_mem_usage=False,    # Set low_cpu_mem_usage to False
 torch_dtype=torch.float16,
             trust_remote_code=False,
