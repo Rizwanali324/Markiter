@@ -2,4 +2,4 @@ transformers==4.42.2
 torch
 gtts
 streamlit
-accelerate
+accelerate==0.31.0
