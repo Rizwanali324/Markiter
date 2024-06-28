@@ -1,5 +1,5 @@
 transformers==4.30.0
-torch==1.2.1
+torch==1.9.1
 gradio==3.0.0
 SpeechRecognition
 gtts==2.5.1
