@@ -1,10 +1,10 @@
-transformers==4.30
-torch==2.1
-gradio
+transformers==4.30.0
+torch==1.2.1
+gradio==3.0.0
 SpeechRecognition
-gtts
+gtts==2.5.1
 pydub
-streamlit
+streamlit==1.36.0
 pyngrok
 accelerate==0.31.0
 bitsandbytes==0.43.1
