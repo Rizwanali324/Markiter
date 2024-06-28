@@ -20,7 +20,7 @@ def setup_model(model_name):
             trust_remote_code=False,
             revision="main"
         )
-        tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+        tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
         model.eval()
         logging.info('Model and tokenizer setup completed.')
         return model, tokenizer
