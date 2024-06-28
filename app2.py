@@ -10,7 +10,7 @@ import logging
 logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Set up the model and tokenizer
-@st.cache(allow_output_mutation=True)
+@st.cache_resource
 def setup_model(model_name):
     logging.info('Setting up model and tokenizer.')
     model = AutoModelForCausalLM.from_pretrained(
@@ -40,7 +40,7 @@ def generate_response(model, tokenizer, prompt, max_new_tokens=140):
 def remove_tags(text):
     logging.info('Removing tags from the text.')
     tag_regex = r"<[^>]*>"  # Standard HTML tags
-    custom_tag_regex = r"<.*?>|\[.*?\]|{\s*?\(.*?\)\s*}"  # Custom, non-standard tags (may need adjustments)
+    custom_tag_regex = r"<.*?>|\[.*?\]|\{\s*?\(.*?\)\s*\}"  # Custom, non-standard tags (may need adjustments)
     all_tags_regex = f"{tag_regex}|{custom_tag_regex}"  # Combine patterns
     cleaned_text = re.sub(all_tags_regex, "", text)
     logging.info('Tags removed.')
