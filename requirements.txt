@@ -2,3 +2,4 @@ transformers==4.42.2
 torch
 gtts
 streamlit
+accelerate
