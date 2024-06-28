@@ -6,4 +6,4 @@ gtts
 pydub
 streamlit
 pyngrok
-accelerate
+accelerate==0.31.0
