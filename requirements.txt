@@ -7,3 +7,4 @@ pydub
 streamlit
 pyngrok
 accelerate==0.31.0
+bitsandbytes
