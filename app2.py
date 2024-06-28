@@ -3,7 +3,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
 # Function to set up the model and tokenizer
-@st.cache_resource(allow_output_mutation=True)
+@st.cache_resource
 def setup_model(model_name):
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
