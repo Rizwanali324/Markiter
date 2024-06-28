@@ -3,11 +3,11 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
 # Function to set up the model and tokenizer
-@st.cache_resource
+@st.cache(allow_output_mutation=True)
 def setup_model(model_name):
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        device_map="auto", 
+        device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
         trust_remote_code=False,
         revision="main"
     )
@@ -18,8 +18,8 @@ def setup_model(model_name):
 # Function to generate a response from the model
 def generate_response(model, tokenizer, prompt, max_new_tokens=140):
     inputs = tokenizer(prompt, return_tensors="pt")
-    outputs = model.generate(input_ids=inputs["input_ids"].to("cuda"), max_new_tokens=max_new_tokens)
-    return tokenizer.batch_decode(outputs)[0]
+    outputs = model.generate(input_ids=inputs["input_ids"].to(model.device), max_new_tokens=max_new_tokens)
+    return tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
 
 # Main function for the Streamlit app
 def main():
