@@ -1,3 +1,4 @@
+%%writefile app.py
 import streamlit as st
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
@@ -20,7 +21,6 @@ def setup_model(model_name):
             revision="main"
         )
         tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
-        model.eval()
         logging.info('Model and tokenizer setup completed.')
         return model, tokenizer
     except Exception as e:
