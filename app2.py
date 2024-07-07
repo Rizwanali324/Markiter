@@ -7,17 +7,15 @@ import os
 import logging
 
 # Set up logging
-logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='app.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Set up the model and tokenizer
-@st.cache_resource
 def setup_model(model_name):
     logging.info('Setting up model and tokenizer.')
     try:
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            low_cpu_mem_usage=False,    # Set low_cpu_mem_usage to False
-torch_dtype=torch.float16,
+            low_cpu_mem_usage=False,
+            torch_dtype=torch.float16,
             trust_remote_code=False,
             revision="main"
         )
@@ -30,30 +28,26 @@ torch_dtype=torch.float16,
         st.error(f"Failed to set up model and tokenizer: {str(e)}")
         return None, None
 
-# Generate a response from the model
 def generate_response(model, tokenizer, prompt, max_new_tokens=140):
     logging.info('Generating response for the prompt.')
     try:
         inputs = tokenizer(prompt, return_tensors="pt")
         outputs = model.generate(input_ids=inputs["input_ids"].to("cuda"), max_new_tokens=max_new_tokens)
         response = tokenizer.batch_decode(outputs)[0]
-      
-        # Extract only the response part (assuming everything after the last newline belongs to the response)
         response_parts = response.split("\n")
         logging.info('Response generated.')
-        return response_parts[-1]  # Return the last element (response)
+        return response_parts[-1]
     except Exception as e:
         logging.error(f'Error generating response: {str(e)}')
         st.error(f"Failed to generate response: {str(e)}")
         return None
 
-# Remove various tags using regular expressions
 def remove_tags(text):
     logging.info('Removing tags from the text.')
     try:
-        tag_regex = r"<[^>]*>"  # Standard HTML tags
-        custom_tag_regex = r"<.*?>|\[.*?\]|\{\s*?\(.*?\)\s*\}"  # Custom, non-standard tags (may need adjustments)
-        all_tags_regex = f"{tag_regex}|{custom_tag_regex}"  # Combine patterns
+        tag_regex = r"<[^>]*>"
+        custom_tag_regex = r"<.*?>|\[.*?\]|\{\s*?\(.*?\)\s*\}"
+        all_tags_regex = f"{tag_regex}|{custom_tag_regex}"
         cleaned_text = re.sub(all_tags_regex, "", text)
         logging.info('Tags removed.')
         return cleaned_text
@@ -62,7 +56,6 @@ def remove_tags(text):
         st.error(f"Failed to remove tags: {str(e)}")
         return text
 
-# Generate the audio file
 def text_to_speech(text, filename="response.mp3"):
     logging.info('Generating speech audio file.')
     try:
@@ -75,7 +68,6 @@ def text_to_speech(text, filename="response.mp3"):
         st.error(f"Failed to generate speech audio file: {str(e)}")
         return None
 
-# Main function for the Streamlit app
 def main():
     st.title("Virtual Marketer Assistant")
     st.write("Enter a comment and get a response from the virtual marketer assistant. Download the response as an MP3 file.")
