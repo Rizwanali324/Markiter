@@ -69,8 +69,11 @@ if user_prompt := st.chat_input("Your message here", key="user_input"):
     with st.chat_message("user"):
         st.markdown(user_prompt)
 
+    # Format the prompt using the chain's prompt template
+    formatted_prompt = llm_chain.steps[0].format_prompt(question=user_prompt).to_string()
+
     # Pass our input to the LLM chain and capture the final responses.
-    response = llm_chain.invoke({"question": str(user_prompt)})
+    response = llm_chain.invoke({"question": formatted_prompt})
 
     # Add the response to the session state
     st.session_state.messages.append({"role": "assistant", "content": response})
