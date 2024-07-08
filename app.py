@@ -70,7 +70,7 @@ if user_prompt := st.chat_input("Your message here", key="user_input"):
         st.markdown(user_prompt)
 
     # Pass our input to the LLM chain and capture the final responses.
-    response = llm_chain.invoke({"question": user_prompt})
+    response = llm_chain.invoke({"question": str(user_prompt)})
 
     # Add the response to the session state
     st.session_state.messages.append({"role": "assistant", "content": response})
