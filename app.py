@@ -1,8 +1,8 @@
-from datetime import datetime
 import streamlit as st
 from langchain_community.llms import LlamaCpp
 from langchain.prompts import PromptTemplate
 from huggingface_hub import hf_hub_download
+from datetime import datetime
 import json
 import os
 
@@ -94,7 +94,7 @@ if user_prompt := st.chat_input("Your message here", key="user_input"):
 
     # Format the prompt and generate a response
     formatted_prompt = llm_chain.steps[0].format_prompt(question=user_prompt).to_string()
-    response = llm_chain.invoke({"question": formatted_prompt})
+    response = llm_chain.invoke(formatted_prompt)  # Pass the string directly
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     st.session_state.messages.append({"role": "assistant", "content": response, "timestamp": timestamp})
