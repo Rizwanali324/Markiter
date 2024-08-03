@@ -96,6 +96,9 @@ if user_prompt := st.chat_input("Your message here", key="user_input"):
     formatted_prompt = llm_chain.steps[0].format_prompt(question=user_prompt).to_string()
     response = llm_chain.invoke(formatted_prompt)  # Pass the string directly
 
+    # Ensure response is a string
+    response = str(response)
+
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     st.session_state.messages.append({"role": "assistant", "content": response, "timestamp": timestamp})
 
