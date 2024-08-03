@@ -1,8 +1,8 @@
+from datetime import datetime
 import streamlit as st
 from langchain_community.llms import LlamaCpp
 from langchain.prompts import PromptTemplate
 from huggingface_hub import hf_hub_download
-from datetime import datetime
 import json
 import os
 
@@ -70,12 +70,14 @@ if "messages" not in st.session_state:
 # Function to display chat messages
 def display_chat_messages():
     for message in st.session_state.messages:
+        # Add a timestamp if it doesn't exist
+        timestamp = message.get("timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         with st.chat_message(message["role"]):
-            st.markdown(f"**{message['role']}** ({message['timestamp']}):\n\n{message['content']}")
+            st.markdown(f"**{message['role']}** ({timestamp}):\n\n{message['content']}")
 
 # Function to clear the chat history
 def clear_chat_history():
-    st.session_state.messages = [{"role": "assistant", "content": "Chat history cleared. How may I help you today?"}]
+    st.session_state.messages = [{"role": "assistant", "content": "Chat history cleared. How may I help you today?", "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}]
     save_chat_history(st.session_state.messages)
     st.experimental_rerun()
 
