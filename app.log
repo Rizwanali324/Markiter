@@ -1,6 +1,0 @@
-2024-06-28 14:20:49,073 - INFO - Main function triggered.
-2024-06-28 14:20:49,079 - INFO - Setting up model and tokenizer.
-2024-06-28 14:20:56,089 - INFO - PyTorch version 2.3.1 available.
-2024-06-28 14:21:03,011 - WARNING - CUDA extension not installed.
-2024-06-28 14:21:03,027 - WARNING - CUDA extension not installed.
-2024-06-28 14:21:50,582 - ERROR - Error setting up model and tokenizer: Found modules on cpu/disk. Using Exllama or Exllamav2 backend requires all the modules to be on GPU.You can deactivate exllama backend by setting `disable_exllama=True` in the quantization config object
