@@ -17,7 +17,7 @@ def get_llm_response(query, chat_history):
     """
 
     prompt = ChatPromptTemplate.from_template(template)
-    llm = ChatGroq(model="llama-3.1-70b-versatile", api_key=api_key)
+    llm = ChatGroq(model="llama-3.1-70b-versatile", api_key=api_key,max_tokens=500)
     chain = prompt | llm | StrOutputParser()
 
     return chain.stream({
@@ -26,7 +26,7 @@ def get_llm_response(query, chat_history):
     })
 
 def main():
-    st.set_page_config(page_title='Marketer', page_icon='Markiter/digital markiter.png')
+    st.set_page_config(page_title='Marketer', page_icon='digital markiter.png')
     st.header("Marketer: Your Digital Marketing Assistant")
 
     # Initialize chat history if not already present
