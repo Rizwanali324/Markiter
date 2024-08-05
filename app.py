@@ -26,7 +26,7 @@ def get_llm_response(query, chat_history):
     })
 
 def main():
-    st.set_page_config(page_title='Marketer', page_icon='📈')
+    st.set_page_config(page_title='Marketer', page_icon='Markiter/digital markiter.png')
     st.header("Marketer: Your Digital Marketing Assistant")
 
     # Initialize chat history if not already present
