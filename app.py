@@ -17,7 +17,7 @@ def get_llm_response(query, chat_history):
     """
 
     prompt = ChatPromptTemplate.from_template(template)
-    llm = ChatGroq(model="llama-3.1-70b-versatile", api_key=api_key,max_tokens=50)
+    llm = ChatGroq(model="llama-3.1-70b-versatile", api_key=api_key,max_tokens=500)
     chain = prompt | llm | StrOutputParser()
 
     return chain.stream({
