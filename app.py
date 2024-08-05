@@ -1,16 +1,11 @@
-from dotenv import load_dotenv
 import streamlit as st
 from langchain_groq import ChatGroq
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-import os
 
-# Load environment variables from .env file
-load_dotenv()
-
-# Retrieve the API key from the environment
-api_key = os.getenv("API_KEY")
+# Retrieve the API key from Streamlit secrets
+api_key = st.secrets['secrets']["API_KEY"]
 
 def get_llm_response(query, chat_history):
     template = """
