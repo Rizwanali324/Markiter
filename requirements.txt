@@ -1,12 +1,6 @@
-# transformers==4.42.2
-# torch
-# gtts
-# streamlit
-# accelerate==0.31.0
-# optimum
-# auto-gptq
-langchain==0.0.321
-llama-cpp-python==0.2.11
-huggingface_hub==0.18.0
-streamlit==1.27.2
-langchain_community
+langchain==0.2.11
+langchain-community==0.2.10
+langchain-core==0.2.26
+langchain-groq==0.1.9
+python-dotenv==1.0.1
+streamlit==1.37.0
