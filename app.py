@@ -28,7 +28,9 @@ def get_llm_response(query, chat_history):
 def main():
     st.set_page_config(page_title='Marketer', page_icon='digital markiter.png')
     st.header("Marketer: Your Digital Marketing Assistant")
-
+    st.sidebar.markdown("# Aibytec")
+    
+    st.sidebar.image('logo.jpg', width=200)
     # Initialize chat history if not already present
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = [
