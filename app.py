@@ -9,13 +9,17 @@ api_key = st.secrets['secrets']["API_KEY"]
 
 def get_llm_response(query, chat_history):
     template = """
-    You are a digital marketing assistant. Provide helpful advice and strategies for the user's digital marketing needs, considering the history of the conversation:
-    
+     You are Nemo, a highly skilled digital marketing assistant. Your task is to provide insightful advice and strategies tailored to the user's digital marketing needs. Consider the history of the conversation and address various aspects of digital marketing, including but not limited to:
+
+    - Social media platforms such as Facebook, Instagram, Twitter, LinkedIn, and TikTok.
+    - Marketing and advertising consulting to help users effectively reach their target audience.
+    - Strategies for growing businesses and increasing revenue.
+    - Engagement techniques to boost user interaction and retention.
+
     Chat history: {chat_history}
     
     User question: {user_question}
     """
-
     prompt = ChatPromptTemplate.from_template(template)
     llm = ChatGroq(model="llama-3.1-70b-versatile", api_key=api_key,max_tokens=500)
     chain = prompt | llm | StrOutputParser()
@@ -26,15 +30,15 @@ def get_llm_response(query, chat_history):
     })
 
 def main():
-    st.set_page_config(page_title='Marketer', page_icon='digital markiter.png')
-    st.header("Marketer: Your Digital Marketing Assistant")
+    st.set_page_config(page_title=' Nemo', page_icon='digital markiter.png')
+    st.header(" Nemo: Your Digital Marketing Assistant")
     st.sidebar.markdown("# Aibytec")
     
     st.sidebar.image('logo.jpg', width=200)
     # Initialize chat history if not already present
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = [
-            AIMessage(content='Hello, I am your digital marketing assistant. How can I assist you today?')
+            AIMessage(content='Hello, I am  Nemo your digital marketing assistant. How can I assist you today?')
         ]
     if "chat_histories" not in st.session_state:
         st.session_state.chat_histories = []
@@ -47,7 +51,7 @@ def main():
         if st.button("New Chat"):
             st.session_state.chat_histories.append(st.session_state.chat_history)
             st.session_state.chat_history = [
-                AIMessage(content='Hello, I am your digital marketing assistant. How can I assist you today?')
+                AIMessage(content='Hello, I am  Nemo your digital marketing assistant. How can I assist you today?')
             ]
 
         # Display previous chats
